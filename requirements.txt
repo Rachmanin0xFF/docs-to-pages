@@ -1,0 +1,4 @@
+gdown==5.2.0
+markitdown
+pandoc
+jinja2
