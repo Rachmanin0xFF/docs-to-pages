@@ -37,7 +37,7 @@ jobs:
       - name: Check whether to commit files in content/
         id: check_config
         run: |
-          if grep -q 'commit-static-html: false' _config.yml; then
+          if grep -q 'commit-static-html: true' _config.yml; then
             echo "commitstatic=true" >> $GITHUB_ENV
           else
             echo "commitstatic=false" >> $GITHUB_ENV
