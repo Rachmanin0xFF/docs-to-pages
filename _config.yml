@@ -1,13 +1,20 @@
+
+#===================================#
+
 title: Your title here!
 email: youremail@here.com
 description: This description will appear in Google search results!
 
-source: content
+drive_folder_path: "https://drive.google.com/drive/folders/1qxZ8lNIr7V38ldizT5vlzgpQqLYIGXwo?usp=drive_link"
+
+#===================================#
+
+theme: minima
+
+#===================================#
+
+source: "/docs-to-pages"
 incremental: false
 safe: true
-gist:
-  noscript: false
 highlighter: rouge
 markdown: kramdown
-  math_engine: mathjax
-  syntax_highlighter: rouge
