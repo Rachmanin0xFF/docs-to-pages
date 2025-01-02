@@ -1,15 +1,26 @@
-name: Build and Deploy
+name: build-and-deploy
 
 on:
   workflow_dispatch:
 
-jobs:
-  publish:
-    runs-on: ubuntu-latest
+# Apparently "write" also implies "read" ...
+permissions:
+  contents: write
+  pages: write
+  id-token: write
 
+# Skip runs queued between in-progress and latest, but don't cancel in-progress runs
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  # Pulls changes from Drive and commits
+  build:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Init Python
         uses: actions/setup-python@v4
@@ -20,5 +31,35 @@ jobs:
       - name: Install Python dependencies
         run: pip install -r requirements.txt
       
-      - name: Query Google Drive
-        run: python scripts/download_drive_contents.py
+      - name: Download & Parse Drive Content
+        run: python scripts/fetch_drive_contents.py
+      
+      - name: Commit changes
+        run: |
+          git config --global user.name '${{ github.actor }} - Automated'
+          git config --global user.email '${{ github.actor }}@users.noreply.github.com'
+          git commit -am "Automated commit from build-and-deploy workflow"
+          git push
+  
+  # Deploys the contents to pages
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          # Upload entire repository
+          path: 'content/'
+          
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

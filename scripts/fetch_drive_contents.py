@@ -44,8 +44,7 @@ def rework_HTML(html_path: str, id_dict: dict[str, str]) -> None:
     for element in elements:
         element['style'] = 'margin: auto; width: 50%;'
     
-    # Fix hyperlinks!
-
+    # This fixes hyperlinks!
     # Does this count as parsing HTML with regex? lmao
     pattern = r'/d/([a-zA-Z0-9_-]+)' # Matches document ids
     links = soup.find_all('a', href=re.compile(pattern))
