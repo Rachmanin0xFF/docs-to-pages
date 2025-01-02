@@ -34,7 +34,17 @@ jobs:
       - name: Download & Parse Drive Content
         run: python scripts/fetch_drive_contents.py
       
-      - name: Commit changes
+      - name: Check whether to commit files in content/
+        id: check_config
+        run: |
+          if grep -q 'commit-static-html: false' _config.yml; then
+            echo "commitstatic=true" >> $GITHUB_ENV
+          else
+            echo "commitstatic=false" >> $GITHUB_ENV
+          fi
+
+      - name: Commit static pages if requested in _config.yml
+        if: env.commitstatic == 'true'
         run: |
           git add content/
           git config --global user.name '${{ github.actor }} - Automated'

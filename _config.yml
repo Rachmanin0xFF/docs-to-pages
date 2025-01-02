@@ -3,14 +3,10 @@
 
 title: Your title here!
 email: youremail@here.com
-description: This description will appear in Google search results!
 
 drive_folder_path: "https://drive.google.com/drive/folders/1qxZ8lNIr7V38ldizT5vlzgpQqLYIGXwo?usp=drive_link"
 
 #===================================#
 
 source: "/docs-to-pages"
-incremental: false
-safe: true
-highlighter: rouge
-markdown: kramdown
+commit-static-html: false
