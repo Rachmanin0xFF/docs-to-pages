@@ -2,9 +2,9 @@
 
 ## What is this?
 
-GitHub (this website) lets users host [static web pages](https://en.wikipedia.org/wiki/Static_web_page) for free with a service called [GitHub Pages](https://pages.github.com/). However, using this service requires a little technical know-how that can seem daunting for non-programmer folk.
+GitHub (this website) lets users host [static web pages](https://en.wikipedia.org/wiki/Static_web_page) for free with a service called [GitHub Pages](https://pages.github.com/). However, using this service requires a little technical know-how that can seem daunting for non-programmer folk. 
 
-**docs-to-pages** is a project that *automatically creates a static website* from a **Google Drive folder**. It takes all the Google Docs in the folder and splats them onto a web page.
+**docs-to-pages** is a project that *automatically creates a static website* from a **Google Drive folder**. It takes all the Google Docs in the folder and splats them onto a web page. You don't have to download anything, compile anything, or run anything. Everything runs right on GitHub's servers (for free).
 
 ## Instructions
 
