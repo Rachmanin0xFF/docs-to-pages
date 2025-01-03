@@ -4,6 +4,7 @@ import gdown
 import os
 from bs4 import BeautifulSoup
 import re
+from urllib.parse import urlparse, parse_qs
 
 GDOWN_OUTPUT_PATH = "content"
 
@@ -29,11 +30,12 @@ def relative_path(src_path: str, dest_path: str) -> str:
 # (centers content, etc.)
 '''
 Makes the exported .HTML a little better for the web. Currently, this function:
-* Centers the page's content
+* Adds some html to <head>
+* Cleans up links (removes Google trackers, etc.)
 * Fixes inter-site hyperlinks
 '''
 def rework_HTML(html_path: str, id_dict: dict[str, str], template_path: str, config_path: str) -> None:
-    # Load HTML
+    # Load HTML into bs4
     with open(html_path, 'r') as file:
         html_content = file.read()
     soup = BeautifulSoup(html_content, 'html.parser')
@@ -45,11 +47,17 @@ def rework_HTML(html_path: str, id_dict: dict[str, str], template_path: str, con
     config.read(config_path)
     template_data = dict(config.items('LAYOUT'))
 
-    # Append style to 
+    # Append <head> with the filled template
     head = soup.find('head')
     head.append(BeautifulSoup(style_template.render(template_data), 'html.parser'))
     
-    # This fixes hyperlinks!
+    # General link cleanup
+    links = soup.find_all('a')
+    for link in links:
+        parsed_url = urlparse(link['href'])
+        link['href'] = parse_qs(parsed_url.query).get('q', [None])[0]
+
+    # Fix hyperlinks
     # Does this count as parsing HTML with regex? lmao
     pattern = r'/d/([a-zA-Z0-9_-]+)' # Matches document ids
     links = soup.find_all('a', href=re.compile(pattern))
