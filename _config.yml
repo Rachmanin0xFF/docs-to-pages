@@ -1,9 +1,0 @@
-
-#===================================#
-
-drive_folder_path: "https://drive.google.com/drive/folders/1qxZ8lNIr7V38ldizT5vlzgpQqLYIGXwo?usp=drive_link"
-
-#===================================#
-
-source: "/docs-to-pages"
-commit-static-html: false

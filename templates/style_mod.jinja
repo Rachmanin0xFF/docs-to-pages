@@ -1,0 +1,21 @@
+<style>
+    body, html {
+        width: 100%;
+        overflow-x: hidden;
+        box-sizing: border-box;
+    }
+    .doc-content {
+        padding: 20px;
+        margin: auto;
+        max-width: min({{ contentmaxwidth }}, 100%);
+    }
+
+    /* For mobile devices */
+    @media screen and (max-width: 600px) {
+        .doc-content {
+            padding: 10px;
+            width: 90%;
+        }
+    }
+</style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">

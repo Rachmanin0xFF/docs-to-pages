@@ -1,4 +1,5 @@
-import yaml
+import configparser
+from jinja2 import Template
 import gdown
 import os
 from bs4 import BeautifulSoup
@@ -31,14 +32,22 @@ Makes the exported .HTML a little better for the web. Currently, this function:
 * Centers the page's content
 * Fixes inter-site hyperlinks
 '''
-def rework_HTML(html_path: str, id_dict: dict[str, str]) -> None:
+def rework_HTML(html_path: str, id_dict: dict[str, str], template_path: str, config_path: str) -> None:
+    # Load HTML
     with open(html_path, 'r') as file:
         html_content = file.read()
-
     soup = BeautifulSoup(html_content, 'html.parser')
-    elements = soup.find_all(class_='doc-content')
-    for element in elements:
-        element['style'] = 'margin: auto; width: 50%;'
+
+    # Read template and config
+    with open(template_path, 'r') as f:
+        style_template = Template(f.read())
+    config = configparser.ConfigParser()
+    config.read(config_path)
+    template_data = dict(config.items('LAYOUT'))
+
+    # Append style to 
+    head = soup.find('head')
+    head.append(BeautifulSoup(style_template.render(template_data), 'html.parser'))
     
     # This fixes hyperlinks!
     # Does this count as parsing HTML with regex? lmao
@@ -49,22 +58,22 @@ def rework_HTML(html_path: str, id_dict: dict[str, str]) -> None:
         document_id = match.group(1)
         if document_id in id_dict:
             link['href'] = relative_path(html_path, id_dict[document_id])
-
+    
+    # Write to output path
     with open(html_path, 'w', encoding='utf-8') as file:
-        file.write(soup.prettify())
+        if 'true' in config['GENERAL']['PrettifyHTML'].lower():
+            file.write(soup.prettify())
+        else:
+            file.write(str(soup))
 
-# Read settings from YAML config file
-with open("_config.yml") as stream:
-    try:
-        config = yaml.safe_load(stream)
-    except yaml.YAMLError as exc:
-        print(exc)
-        print('Error loading YAML! aborting...')
-        exit()
+# Read settings from config file
+drive_folder_path = ''
+with open('LINK_TO_DRIVE_FOLDER', 'r') as f:
+    drive_folder_path = f.readline().strip()
 
-if 'drive_folder_path' in config and len(config['drive_folder_path']) > 10:
+if len(drive_folder_path) > 10:
     # Pull list of files using gdown
-    file_list = gdown.download_folder(config['drive_folder_path'], output=GDOWN_OUTPUT_PATH, skip_download=True)
+    file_list = gdown.download_folder(drive_folder_path, output=GDOWN_OUTPUT_PATH, skip_download=True)
 
     # gdown.download_folder() returns None if it it fails to retreive folder contents
     if file_list is not None:
@@ -86,7 +95,10 @@ if 'drive_folder_path' in config and len(config['drive_folder_path']) > 10:
         print("Fixing up HTML...")
         for to_download in file_list:
             html_path = to_download.local_path + '.html'
-            rework_HTML(html_path, id_dict)
+            rework_HTML(html_path,
+                        id_dict,
+                        'templates/style_mod.jinja',
+                        'CONFIG.ini')
     else:
         print("gdown failed to download the folder!")
 else:

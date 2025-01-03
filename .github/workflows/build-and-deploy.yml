@@ -37,13 +37,13 @@ jobs:
       - name: Check whether to commit files in content/
         id: check_config
         run: |
-          if grep -q 'commit-static-html: true' _config.yml; then
+          if grep -iq 'CommitStaticHTML = TRUE' CONFIG.ini; then
             echo "commitstatic=true" >> $GITHUB_ENV
           else
             echo "commitstatic=false" >> $GITHUB_ENV
           fi
 
-      - name: Commit static pages if requested in _config.yml
+      - name: Commit static pages if requested in CONFIG.ini
         if: env.commitstatic == 'true'
         run: |
           git add content/
