@@ -98,7 +98,7 @@ if len(drive_folder_path) > 10:
                         output=html_path,
                         format="html")
 
-            id_dict[to_download.id] = html_path
+            id_dict[to_download.id] = to_download.local_path
 
         print("Fixing up HTML...")
         for to_download in file_list:
