@@ -6,15 +6,6 @@ import re
 
 GDOWN_OUTPUT_PATH = "content"
 
-# Read settings from YAML config file
-with open("_config.yml") as stream:
-    try:
-        config = yaml.safe_load(stream)
-    except yaml.YAMLError as exc:
-        print(exc)
-        print('Error loading YAML! aborting...')
-        exit()
-
 '''
 Returns a relative path from src_path to dest_path
 '''
@@ -35,6 +26,11 @@ def relative_path(src_path: str, dest_path: str) -> str:
 
 # Makes the exported .HTML a little better for web design
 # (centers content, etc.)
+'''
+Makes the exported .HTML a little better for the web. Currently, this function:
+* Centers the page's content
+* Fixes inter-site hyperlinks
+'''
 def rework_HTML(html_path: str, id_dict: dict[str, str]) -> None:
     with open(html_path, 'r') as file:
         html_content = file.read()
@@ -57,24 +53,41 @@ def rework_HTML(html_path: str, id_dict: dict[str, str]) -> None:
     with open(html_path, 'w', encoding='utf-8') as file:
         file.write(soup.prettify())
 
-# Pull list of files using gdown
-file_list = gdown.download_folder(config['drive_folder_path'], output=GDOWN_OUTPUT_PATH, skip_download=True)
-id_dict = {}
+# Read settings from YAML config file
+with open("_config.yml") as stream:
+    try:
+        config = yaml.safe_load(stream)
+    except yaml.YAMLError as exc:
+        print(exc)
+        print('Error loading YAML! aborting...')
+        exit()
 
-for to_download in file_list:
-    # Ensure local directory structure exists
-    root_dir = os.path.split(to_download.local_path)[0]
-    if not os.path.exists(root_dir):
-        os.makedirs(root_dir)
+if 'drive_folder_path' in config and len(config['drive_folder_path']) > 10:
+    # Pull list of files using gdown
+    file_list = gdown.download_folder(config['drive_folder_path'], output=GDOWN_OUTPUT_PATH, skip_download=True)
 
-    html_path = to_download.local_path + '.html'
-    gdown.download(id=to_download.id,
-                   output=html_path,
-                   format="html")
+    # gdown.download_folder() returns None if it it fails to retreive folder contents
+    if file_list is not None:
+        id_dict = {}
 
-    id_dict[to_download.id] = html_path
+        for to_download in file_list:
+            # Ensure local directory structure exists
+            root_dir = os.path.split(to_download.local_path)[0]
+            if not os.path.exists(root_dir):
+                os.makedirs(root_dir)
 
-print("Fixing up HTML...")
-for to_download in file_list:
-    html_path = to_download.local_path + '.html'
-    rework_HTML(html_path, id_dict)
+            html_path = to_download.local_path + '.html'
+            gdown.download(id=to_download.id,
+                        output=html_path,
+                        format="html")
+
+            id_dict[to_download.id] = html_path
+
+        print("Fixing up HTML...")
+        for to_download in file_list:
+            html_path = to_download.local_path + '.html'
+            rework_HTML(html_path, id_dict)
+    else:
+        print("gdown failed to download the folder!")
+else:
+    print('Drive folder not present in config!')

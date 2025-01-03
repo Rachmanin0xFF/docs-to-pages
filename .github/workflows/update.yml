@@ -1,0 +1,33 @@
+name: Update Repository from Template
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-repo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # add the original repository as an upstream remote
+      - name: Add upstream remote
+        run: |
+          git remote add upstream https://github.com/yourusername/your-repo.git || echo "Upstream already exists"
+          git fetch upstream
+
+      # merge updates
+      - name: Merge updates
+        run: |
+          git checkout --ours _config.yml  # Retain the user's version
+          git add _config.yml
+          git merge upstream/main --allow-unrelated-histories -m "Merge updates from template"
+
+      # Step 4: Push changes to the user's repository
+      - name: Push changes
+        run: |
+          git push origin main
