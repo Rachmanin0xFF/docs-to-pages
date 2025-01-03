@@ -23,8 +23,10 @@ jobs:
       # Merge updates
       - name: Merge updates
         run: |
-          git checkout --ours _config.yml  # Retain the user's version
-          git add _config.yml
+          git checkout --ours CONFIG.ini
+          git checkout --ours LINK_TO_DRIVE_FOLDER
+          git add CONFIG.ini
+          git add LINK_TO_DRIVE_FOLDER
           git merge upstream/main --allow-unrelated-histories -m "Merge updates from template"
 
       - name: Push changes
