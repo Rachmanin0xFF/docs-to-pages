@@ -1,4 +1,4 @@
-name: Update Repository from Template
+name: Update Website Builder
 
 on:
   workflow_dispatch:
@@ -14,20 +14,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      # add the original repository as an upstream remote
+      # Add the original repository as an upstream remote
       - name: Add upstream remote
         run: |
-          git remote add upstream https://github.com/yourusername/your-repo.git || echo "Upstream already exists"
+          git remote add upstream https://github.com/Rachmanin0xFF/docs-to-pages.git || echo "Upstream already exists"
           git fetch upstream
 
-      # merge updates
+      # Merge updates
       - name: Merge updates
         run: |
           git checkout --ours _config.yml  # Retain the user's version
           git add _config.yml
           git merge upstream/main --allow-unrelated-histories -m "Merge updates from template"
 
-      # Step 4: Push changes to the user's repository
       - name: Push changes
         run: |
           git push origin main
