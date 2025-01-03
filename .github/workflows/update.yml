@@ -27,6 +27,8 @@ jobs:
           git checkout --ours LINK_TO_DRIVE_FOLDER
           git add CONFIG.ini
           git add LINK_TO_DRIVE_FOLDER
+          git config --global user.name '${{ github.actor }} - Automated'
+          git config --global user.email '${{ github.actor }}@users.noreply.github.com'
           git merge upstream/main --allow-unrelated-histories -m "Merge updates from template"
 
       - name: Push changes
