@@ -8,10 +8,7 @@ GitHub (this website) lets users host [static web pages](https://en.wikipedia.or
 
 ## Instructions
 
-### 1. Make a GitHub account (if you don't already have one)
-You can do that [here](https://github.com/signup). It'll ask you for an email, username, and password, and might make you verify those things.
+Are you comfortable with programming & GitHub?
 
-### 2. Click the button that says "use this template"
-In the upper right corner of [this page](https://github.com/Rachmanin0xFF/docs-to-pages/tree/main) (hopefully the page you are on), there should be a button that says "Use this template". 
-
-![repository-open-graph-template](https://github.com/user-attachments/assets/56bc035f-6b28-4a42-9c8b-481f40cdbd41)
+* If your answer is "not really", go to [instruction set 1](instructions/v1.md).
+* If your answer is "absolutely", go to [instruction set 2](instructions/v2.md). 
