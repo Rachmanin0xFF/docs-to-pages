@@ -1,6 +1,10 @@
 name: update-backend
 
 on:
+  # Run this script on Sundays
+  # (last zero determines day, 0 = Sunday, ..., 6 = Saturday)
+  schedule:
+    - cron: '0 0 * * 0'
   workflow_dispatch:
 
 permissions:
