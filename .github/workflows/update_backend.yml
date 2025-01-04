@@ -1,4 +1,4 @@
-name: fetch-backend-script-updates
+name: update-backend
 
 on:
   workflow_dispatch:
