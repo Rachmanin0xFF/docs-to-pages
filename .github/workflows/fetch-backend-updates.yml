@@ -17,15 +17,35 @@ jobs:
           fetch-depth: 0
           ref: refs/heads/main
 
+      - name: Check whether to update at all
+        id: update_check
+        run: |
+          if grep -iq 'AutomaticBackendUpdate = TRUE' CONFIG.ini; then
+            echo "update=true" >> $GITHUB_ENV
+          else
+            echo "update=false" >> $GITHUB_ENV
+          fi
+      
+      - name: Check whether to update templates
+        id: update_templates_check
+        if: env.update == 'true'
+        run: |
+          if grep -iq 'OverwriteTemplatesOnBackendUpdate = TRUE' CONFIG.ini; then
+            echo "updatetemplates=true" >> $GITHUB_ENV
+          else
+            echo "updatetemplates=false" >> $GITHUB_ENV
+          fi
+      
       # I tried doing this in a proper git-ty way, but it wasn't working on the Runner.
       # Using `checkout --ours` worked fine on my machine, but for some reason, not here.
       # Anyway, this is my quick, dirty response to whatever that bug was
       # TODO: figure all that out
 
       # I really don't expect anyone to run this, anyway...
-      
+
       # Templates don't update, but they should be used in a backwards-compatible way
       - name: Store config and templates/ in /tmp/
+        if: env.update == 'true'
         run: |
           mkdir /tmp/config_backup/
           mv CONFIG.ini /tmp/config_backup/CONFIG.ini
@@ -37,6 +57,7 @@ jobs:
       # This workflow is just for updating the .py file, really...
       # (and anything else I add that isn't a workflow)
       - name: Wipe and re-download from template
+        if: env.update == 'true'
         run: |
           git remote add template https://github.com/Rachmanin0xFF/docs-to-pages.git || echo "Upstream already exists"
           git fetch template
@@ -47,12 +68,18 @@ jobs:
           git push --force origin main
 
       - name: Recover user files from /tmp/
+        if: env.update == 'true'
         run: |
           mv -f /tmp/config_backup/CONFIG.ini CONFIG.ini
           mv -f /tmp/config_backup/LINK_TO_DRIVE_FOLDER LINK_TO_DRIVE_FOLDER
+        
+      - name: Recover templates if requested
+        if: env.updatetemplates == 'true' && env.update == 'true'
+        run: |
           mv -f /tmp/config_backup/templates templates
       
       - name: Commit old files
+        if: env.update == 'true'
         run: |
           git add .
           git config --global user.name '${{ github.actor }} - Automated'
@@ -60,5 +87,11 @@ jobs:
           git commit -m "Routine backend update (part 2)" || echo "No changes to commit"
       
       - name: Push changes
+        if: env.update == 'true'
         run: |
           git push origin main
+        
+      - name: Clean /tmp/
+        if: env.update == 'true'
+        run: |
+          rm -rf /tmp/config_backup
