@@ -5,6 +5,7 @@ import os
 from bs4 import BeautifulSoup
 import re
 from urllib.parse import urlparse, parse_qs
+import time
 
 GDOWN_OUTPUT_PATH = "content"
 
@@ -96,7 +97,9 @@ if len(drive_folder_path) > 10:
             html_path = to_download.local_path + '.html'
             gdown.download(id=to_download.id,
                         output=html_path,
-                        format="html")
+                        format="html",
+                        use_cookies=False)
+            time.sleep(0.5)
 
             id_dict[to_download.id] = to_download.local_path
 
