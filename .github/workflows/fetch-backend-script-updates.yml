@@ -1,0 +1,64 @@
+name: fetch-backend-script-updates
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update-repo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: refs/heads/main
+
+      # I tried doing this in a proper git-ty way, but it wasn't working on the Runner.
+      # Using `checkout --ours` worked fine on my machine, but for some reason, not here.
+      # Anyway, this is my quick, dirty response to whatever that bug was
+      # TODO: figure all that out
+
+      # I really don't expect anyone to run this, anyway...
+      
+      # Templates don't update, but they should be used in a backwards-compatible way
+      - name: Store config and templates/ in /tmp/
+        run: |
+          mkdir /tmp/config_backup/
+          mv CONFIG.ini /tmp/config_backup/CONFIG.ini
+          mv LINK_TO_DRIVE_FOLDER /tmp/config_backup/LINK_TO_DRIVE_FOLDER
+          mv templates /tmp/config_backup/templates
+          ls -l
+
+      # We can't update workflow files without a PAT, so we have to exclude those :/
+      # This workflow is just for updating the .py file, really...
+      # (and anything else I add that isn't a workflow)
+      - name: Wipe and re-download from template
+        run: |
+          git remote add template https://github.com/Rachmanin0xFF/docs-to-pages.git || echo "Upstream already exists"
+          git fetch template
+          git reset template/main -- . ':!.github/workflows'
+          git config --global user.name '${{ github.actor }} - Automated'
+          git config --global user.email '${{ github.actor }}@users.noreply.github.com'
+          git commit -m "Routine backend update (part 1)"
+          git push --force origin main
+
+      - name: Recover user files from /tmp/
+        run: |
+          mv -f /tmp/config_backup/CONFIG.ini CONFIG.ini
+          mv -f /tmp/config_backup/LINK_TO_DRIVE_FOLDER LINK_TO_DRIVE_FOLDER
+          mv -f /tmp/config_backup/templates templates
+      
+      - name: Commit old files
+        run: |
+          git add .
+          git config --global user.name '${{ github.actor }} - Automated'
+          git config --global user.email '${{ github.actor }}@users.noreply.github.com'
+          git commit -m "Routine backend update (part 2)" || echo "No changes to commit"
+      
+      - name: Push changes
+        run: |
+          git push origin main
