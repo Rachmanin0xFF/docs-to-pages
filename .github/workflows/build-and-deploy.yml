@@ -1,5 +1,6 @@
 name: Build and Deploy Website
 
+# Once weekly (or manually)
 on:
   schedule:
     - cron: '0 0 * * *'
